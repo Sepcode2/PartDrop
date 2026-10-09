@@ -28,9 +28,13 @@ jobs:
         id: version
         run: |
           V=$(python -c "import json;print(json.load(open('metadata.json'))['versions'][0]['version'])")
-          echo "tag=v$V" >> "$GITHUB_OUTPUT"
-          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] && [ "v$V" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME komt niet overeen met metadata.json (v$V)"; exit 1
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "tag=v$V" >> "$GITHUB_OUTPUT"         # nieuwe tag op basis van metadata.json
+          else
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"  # bestaande tag/release gebruiken
+            if [ "v$V" != "$GITHUB_REF_NAME" ]; then
+              echo "::warning::Tag $GITHUB_REF_NAME komt niet overeen met metadata.json (v$V); ZIP wordt toch toegevoegd"
+            fi
           fi
       - name: PCM-pakket bouwen
         run: python build.py
@@ -38,7 +42,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: PartDrop ${{ steps.version.outputs.tag }}
+          name: ${{ github.event_name == 'release' && github.event.release.name || format('PartDrop {0}', steps.version.outputs.tag) }}
           target_commitish: ${{ github.sha }}
           files: dist/PartDrop-*.zip
           generate_release_notes: true
