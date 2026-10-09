@@ -86,3 +86,5 @@ the GitHub release.
 
 MIT. LCSC import uses [easyeda2kicad](https://github.com/uPesy/easyeda2kicad.py) (AGPL-3.0)
 as a separate process; it is not bundled.
+
+  HAVE FUN!!!
