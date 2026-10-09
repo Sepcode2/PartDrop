@@ -1,0 +1,24 @@
+{
+  "$schema": "https://go.kicad.org/pcm/schemas/v1",
+  "name": "PartDrop",
+  "description": "Importeer componenten in één eigen library: LCSC, SnapEDA, Ultra Librarian, Samacsys, Altium.",
+  "description_full": "PartDrop zet symbolen, footprints en 3D-modellen uit LCSC/EasyEDA (via C-nummer), SnapEDA, Ultra Librarian, Samacsys/Mouser, DigiKey en Altium (.SchLib/.PcbLib/.IntLib) samen in één eigen KiCad library. Footprints en 3D-modellen worden automatisch gekoppeld, velden zoals MPN, Manufacturer en LCSC worden ingevuld, de library wordt automatisch in KiCad geregistreerd en je Downloads-map kan in het oog gehouden worden.",
+  "identifier": "be.fme-projects.partdrop",
+  "type": "plugin",
+  "author": {
+    "name": "Seppe",
+    "contact": {
+      "email": "seppe@fme-projects.be"
+    }
+  },
+  "license": "MIT",
+  "resources": {},
+  "tags": ["library", "import", "lcsc", "snapeda", "altium"],
+  "versions": [
+    {
+      "version": "0.3.0",
+      "status": "testing",
+      "kicad_version": "8.0"
+    }
+  ]
+}
