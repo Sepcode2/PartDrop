@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Tests
+        run: python tests/test_importer.py
+      - name: Versie controleren
+        run: |
+          V=$(python -c "import json;print(json.load(open('metadata.json'))['versions'][0]['version'])")
+          test "v$V" = "${GITHUB_REF_NAME}" || { echo "Tag ${GITHUB_REF_NAME} komt niet overeen met metadata.json ($V)"; exit 1; }
+      - name: PCM-pakket bouwen
+        run: python build.py
+      - name: GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/PartDrop-*.zip
+          generate_release_notes: true
