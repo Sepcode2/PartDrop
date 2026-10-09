@@ -1,10 +1,15 @@
 name: Release
 
+# Drie manieren om een release te maken:
+#  1. Actions → Release → "Run workflow"   (makkelijkst: tag komt uit metadata.json)
+#  2. een tag v<versie> pushen vanaf je pc
+#  3. een release publiceren via github.com
 on:
+  workflow_dispatch:
   push:
-    tags: ["v*"]          # tag pushen vanaf je pc
+    tags: ["v*"]
   release:
-    types: [published]    # of release publiceren via github.com
+    types: [published]
 
 permissions:
   contents: write
@@ -19,14 +24,21 @@ jobs:
           python-version: "3.11"
       - name: Tests
         run: python tests/test_importer.py
-      - name: Versie controleren
+      - name: Versie bepalen
+        id: version
         run: |
           V=$(python -c "import json;print(json.load(open('metadata.json'))['versions'][0]['version'])")
-          test "v$V" = "${GITHUB_REF_NAME}" || { echo "Tag ${GITHUB_REF_NAME} komt niet overeen met metadata.json ($V)"; exit 1; }
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] && [ "v$V" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME komt niet overeen met metadata.json (v$V)"; exit 1
+          fi
       - name: PCM-pakket bouwen
         run: python build.py
       - name: GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: PartDrop ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: dist/PartDrop-*.zip
           generate_release_notes: true
