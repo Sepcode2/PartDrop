@@ -2,7 +2,9 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*"]          # tag pushen vanaf je pc
+  release:
+    types: [published]    # of release publiceren via github.com
 
 permissions:
   contents: write
